@@ -2,7 +2,6 @@ package com.news.mewsapi.web;
 
 import com.news.mewsapi.service.models.NewsServiceModel;
 import com.news.mewsapi.service.servicies.NewsService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
@@ -20,28 +19,33 @@ public class NewsController {
         this.newsService = newsService;
     }
 
-    /*
-    Return all news from DB, main page
-     */
-//    @GetMapping
-//    public List<NewsServiceModel> getAllNews() {
-//        return this.newsService.getAllNews();
-//    }
-
     /**
      * Return all news from db if no sorts present
-     * @param sort news?sort=date,desc&description,asc
-     * @return
+     *
+     * @param sort  return news from news?sort=date,desc&description,asc and all variations of sorts
+     * @param date  return news by given date if present in format "yyyy-mm-dd"
+     * @param title return news by title/or part of it, case sensitive
+     * @return news from db
      */
     @GetMapping("/news")
-    public List<NewsServiceModel> getNewsById(Sort sort) {
-        return this.newsService.getAllNews(sort);
+    public List<NewsServiceModel> getNewsById(Sort sort, @RequestParam(required = false) String date, String title) {
+
+        if (date != null && title == null) {
+            return newsService.getNewsByDate(date);
+        } else if (title != null && date == null) {
+            return newsService.getNewsByTitle(title);
+        } else if (date != null) {
+            return newsService.getAllNewsByDateAndTitle(date, title);
+        }
+        return newsService.getAllNews(sort);
     }
+
 
     /**
      * Save new news to DB
-     * @param newsServiceModel
-     * @return
+     *
+     * @param newsServiceModel mapping input to NewsServiceModel
+     * @return saved news
      */
     @PostMapping("/news/add")
     public NewsServiceModel saveNews(@RequestBody NewsServiceModel newsServiceModel) {
@@ -50,15 +54,4 @@ public class NewsController {
         return this.newsService.saveNews(newsServiceModel);
     }
 
-    /**
-     * Should check what kind filters need
-     * @param date
-     * @param title
-     * @return
-     */
-
-    @GetMapping("/news/filter")
-    public List<NewsServiceModel> getNewsById(@RequestParam(required = false) String date, String title) {
-        return this.newsService.getAllNews();
-    }
 }

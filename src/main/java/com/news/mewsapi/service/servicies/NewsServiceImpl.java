@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,20 +23,37 @@ public class NewsServiceImpl implements NewsService {
         this.modelMapper = modelMapper;
     }
 
-    public List<NewsServiceModel> getAllNews() {
-        return (List)this.newsRepository.findAll().stream().map((n) -> {
-            return (NewsServiceModel)this.modelMapper.map(n, NewsServiceModel.class);
-        }).collect(Collectors.toList());
-    }
-
     public List<NewsServiceModel> getAllNews(Sort sort) {
-        return (List)this.newsRepository.findAll(sort).stream().map((n) -> {
-            return (NewsServiceModel)this.modelMapper.map(n, NewsServiceModel.class);
-        }).collect(Collectors.toList());
+        return newsRepository.findAll(sort).stream()
+                .map(n -> modelMapper.map(n, NewsServiceModel.class))
+                .collect(Collectors.toList());
     }
 
     public NewsServiceModel saveNews(NewsServiceModel newsServiceModel) {
-        News news = (News)this.modelMapper.map(newsServiceModel, News.class);
-        return (NewsServiceModel)this.modelMapper.map(this.newsRepository.save(news), NewsServiceModel.class);
+        News news = modelMapper.map(newsServiceModel, News.class);
+        return modelMapper.map(newsRepository.save(news), NewsServiceModel.class);
+    }
+
+    @Override
+    public List<NewsServiceModel> getNewsByDate(String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        return newsRepository.findAllByDate(localDate).stream()
+                .map(n -> modelMapper.map(n, NewsServiceModel.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NewsServiceModel> getNewsByTitle(String title) {
+        return newsRepository.findByTitleContaining(title).stream()
+                .map(n -> modelMapper.map(n, NewsServiceModel.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NewsServiceModel> getAllNewsByDateAndTitle(String date, String title) {
+        LocalDate localDate = LocalDate.parse(date);
+        return newsRepository.findByDateAndTitleContaining(localDate, title).stream()
+                .map(n -> modelMapper.map(n, NewsServiceModel.class))
+                .collect(Collectors.toList());
     }
 }
