@@ -17,7 +17,7 @@ public class NewsServiceImpl implements NewsService {
     private final NewsRepository newsRepository;
     private final ModelMapper modelMapper;
 
-    
+    //TODO test branch
     public NewsServiceImpl(NewsRepository newsRepository, ModelMapper modelMapper) {
         this.newsRepository = newsRepository;
         this.modelMapper = modelMapper;
