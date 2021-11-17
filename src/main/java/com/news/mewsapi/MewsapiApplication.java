@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MewsapiApplication {
+public class NewsApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MewsapiApplication.class, args);
+        SpringApplication.run(NewsApiApplication.class, args);
     }
 
 }
